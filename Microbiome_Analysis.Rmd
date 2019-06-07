@@ -1,0 +1,50 @@
+---
+title: "Microbiome Analysis"
+output: pdf_document
+author: "Olajumoke Evangelina Owokotomo"
+date: "4/30/2019"
+header-includes:
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library("Biobase")
+library("grid")
+library("ggplot2")
+library("nlme")
+library(stringr)
+library(dplyr)
+library(phyloseq)
+library(tidyr)
+```
+
+
+## General information
+
+* The dataset is a large phyloseq object saved as R datafile.
+* The metadata has been converted to phyloseq format.
+* OTU Table contains 2353 taxa and 992 samples for all time point (OTU table).
+* The sample are Crohn's disease patients.
+* Samples are randomized to take PlaceboIV or UstekinumabIV ni the trial.
+* Taxonomic assignment of the OTU into 6 taxonomic ranks (Tax data) which are;
+"Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus".
+* 83 information was obtained about the 992 samples which includes their age, sex, race , country, treatment information, CDAI etc. 
+* The CDAI is the standard instrument for evaluating clinical symptoms and disease activity in Crohn's disease.
+* Difference in a subject’s initial Crohn’s disease activity index (CDAI) at baseline and other time point $\Delta_4 - \Delta_0$, $\Delta_6 - \Delta_0$, $\Delta_8 - \Delta_0$, $\Delta_{22} - \Delta_0$.
+* Placebo samples were coded as 0 while treated samples were coded as 1.
+
+
+
+```{r first, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+load("C:/Users/lucp2490.LP2490-02/Desktop/EVANGELINA/PHD FOLDER/PHD/DEA/certifi_ori.rda")
+OTU <- data.frame(certifi_ori@otu_table)
+TAX <- data.frame(certifi_ori@tax_table)
+SAMPEL <- data.frame(certifi_ori@sam_data)
+
+SAMPEL$Treatment= ifelse(SAMPEL$TRTGR=="Placebo",0,1)
+```
