@@ -28,13 +28,14 @@ library(tidyr)
 
 * The dataset is a large phyloseq object saved as R datafile.
 * The metadata has been converted to phyloseq format.
-* OTU Table contains 2353 taxa and 992 samples for all time point (OTU table).
 * The sample are Crohn's disease patients.
+* The CDAI is the standard instrument for evaluating clinical symptoms and disease activity in Crohn's disease.
 * Samples are randomized to take PlaceboIV or UstekinumabIV ni the trial.
 * Taxonomic assignment of the OTU into 6 taxonomic ranks (Tax data) which are;
 "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus".
-* 83 information was obtained about the 992 samples which includes their age, sex, race , country, treatment information, CDAI etc. 
-* The CDAI is the standard instrument for evaluating clinical symptoms and disease activity in Crohn's disease.
+* OTU Table contains 2353 taxa and 992 samples for all time point (OTU table).
+* 83 information was obtained about the samples which includes their age, sex, race , country, treatment information, CDAI etc. 
+* 306 samples information was obtained by baseline, 236 at week4, 261 at week 6 and 189 at week 22. No information about week 8.
 * Difference in a subject’s initial Crohn’s disease activity index (CDAI) at baseline and other time point $\Delta_4 - \Delta_0$, $\Delta_6 - \Delta_0$, $\Delta_8 - \Delta_0$, $\Delta_{22} - \Delta_0$.
 * Placebo samples were coded as 0 while treated samples were coded as 1.
 
@@ -45,6 +46,37 @@ load("C:/Users/lucp2490.LP2490-02/Desktop/EVANGELINA/PHD FOLDER/PHD/DEA/certifi_
 OTU <- data.frame(certifi_ori@otu_table)
 TAX <- data.frame(certifi_ori@tax_table)
 SAMPEL <- data.frame(certifi_ori@sam_data)
-
 SAMPEL$Treatment= ifelse(SAMPEL$TRTGR=="Placebo",0,1)
+
+
+
+Screening_response <- SAMPEL %>% filter(visit == "Screening") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
+                "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
+                "percentdelta0_4"))
+
+
+Week4_response <- SAMPEL %>% filter(visit == "Week 4") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
+              "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
+              "percentdelta0_4"))
+
+
+
+Week6_response <- SAMPEL %>% filter(visit == "Week 6") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
+            "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
+           "percentdelta0_4"))
+
+
+
+Week22_response <- SAMPEL %>% filter(visit == "Week 22") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
+                      "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
+                       "percentdelta0_4"))
+
+otu = as.data.frame(t(OTU))
+otu$visit = SAMPEL$visit
+Screening_otu <- otu %>% filter(visit == "Screening") %>% select(-c("visit"))  %>% data.frame()
+Week4_otu <- otu %>% filter(visit == "Week 4") %>% select(-c("visit"))  %>% data.frame()
+Week6_otu <- otu %>% filter(visit == "Week 6") %>% select(-c("visit"))  %>% data.frame()
+Week22_otu <- otu %>% filter(visit == "Week 22") %>% select(-c("visit"))  %>% data.frame()
+
+
 ```
