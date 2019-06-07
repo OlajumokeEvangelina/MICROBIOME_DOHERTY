@@ -79,4 +79,27 @@ Week6_otu <- otu %>% filter(visit == "Week 6") %>% select(-c("visit"))  %>% data
 Week22_otu <- otu %>% filter(visit == "Week 22") %>% select(-c("visit"))  %>% data.frame()
 
 
+
+freq_zero = data.frame(otunames = colnames(Week22_otu), Full_data = as.vector(apply(otu[,-2354] == 0, 2, sum)),
+Screening = as.vector(apply(Screening_otu == 0, 2, sum)), week4 = as.vector(apply(Week4_otu == 0, 2, sum)),
+week6 = as.vector(apply(Week6_otu == 0, 2, sum)), week22 = as.vector(apply(Week22_otu == 0, 2, sum)),
+otunumber = 1:dim(Week4_otu)[2])
+
+prop_zero = data.frame(otunames = colnames(Week22_otu), Full_data = freq_zero$Full_data/dim(otu)[1], Screening = freq_zero$Screening/dim(Screening_response)[1], 
+                      week4 = freq_zero$week4/dim(Week4_otu)[1], week6 = freq_zero$week6/dim(Week6_otu)[1],
+                      week22 = freq_zero$week22/dim(Week22_otu)[1],otunumber = 1:dim(Week4_otu)[2])
+
+
+```
+
+## Frequency and proportion of zero samples per OTU
+### At all timepoints
+```{r g1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE}
+
+ggplot(prop_zero, aes(x=otunumber, y=Full_data)) +
+  geom_point() + xlab("OTU number") +  
+  scale_y_continuous(breaks  = c(0,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000),
+  labels = c(0,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000))
+
+
 ```
