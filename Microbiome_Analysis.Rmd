@@ -21,6 +21,7 @@ library(stringr)
 library(dplyr)
 library(phyloseq)
 library(tidyr)
+library(ggpubr)
 ```
 
 
@@ -94,12 +95,53 @@ prop_zero = data.frame(otunames = colnames(Week22_otu), Full_data = freq_zero$Fu
 
 ## Frequency and proportion of zero samples per OTU
 ### At all timepoints
-```{r g1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE}
+
+```{r g1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(prop_zero, aes(x=otunumber, y=Full_data)) +
-  geom_point() + xlab("OTU number") +  
-  scale_y_continuous(breaks  = c(0,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000),
-  labels = c(0,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000))
+  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero")+
+  scale_y_continuous(breaks  = seq(0,1, by = 0.05))
 
+```
+
+
+### At week 0
+```{r g2, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(prop_zero, aes(x=otunumber, y=Screening)) +
+  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero")+
+  scale_y_continuous(breaks  = seq(0,1, by = 0.05))
+
+```
+
+
+### At week 4
+```{r g3, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(prop_zero, aes(x=otunumber, y=week4)) +
+  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero")+
+  scale_y_continuous(breaks  = seq(0,1, by = 0.05))
+
+```
+
+
+
+### At week 6
+```{r g4, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(prop_zero, aes(x=otunumber, y=week6)) +
+  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero")+
+  scale_y_continuous(breaks  = seq(0,1, by = 0.05))
+
+```
+
+
+
+### At week 22
+```{r g5, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(prop_zero, aes(x=otunumber, y=week22)) +
+  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero")+
+  scale_y_continuous(breaks  = seq(0,1, by = 0.05))
 
 ```
