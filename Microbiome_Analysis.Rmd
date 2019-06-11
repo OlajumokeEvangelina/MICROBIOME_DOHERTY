@@ -145,3 +145,21 @@ ggplot(prop_zero, aes(x=otunumber, y=week22)) +
   scale_y_continuous(breaks  = seq(0,1, by = 0.05))
 
 ```
+
+
+
+```{r second, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+
+phy_week0 <- phyloseq(otu_table(t(Screening_otu), taxa_are_rows = TRUE), sample_data(Screening_response), tax_table(as.matrix(TAX)))
+
+phy_week4 <- phyloseq(otu_table(t(Week4_otu), taxa_are_rows = TRUE), sample_data(Week4_response), tax_table(as.matrix(TAX)))
+
+phy_week6 <- phyloseq(otu_table(t(Week6_otu), taxa_are_rows = TRUE), sample_data(Week6_response), tax_table(as.matrix(TAX)))
+
+phy_week22 <- phyloseq(otu_table(t(Week22_otu), taxa_are_rows = TRUE), sample_data(Week22_response), tax_table(as.matrix(TAX)))
+
+rich_week0 <- estimate_richness(phy_week0)
+rich_week4 <- estimate_richness(phy_week4)
+rich_week6 <- estimate_richness(phy_week6)
+rich_week22 <- estimate_richness(phy_week22)
+```
