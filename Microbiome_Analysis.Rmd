@@ -35,9 +35,7 @@ JM = function(Mdata, Response , Covariates, MultTest){
   pearson <- spearman <- pValuePearson <- logratio <- AdjPearson  <-  c(1:Nmets) 
   Names <- rownames(Mdata)
   
-  
   for (Nmet in 1:length(Names)) {
-    print(Nmet)
     feature1 <-as.vector(Mdata[Nmet,])
     sampleID <- c(1:length(feature1)) 
     
@@ -339,7 +337,7 @@ grid.arrange(a3, a4, nrow = 1)
 
 ## Adjusted association from Joint modelling  (Response is CDAI change from baseline)
 ### Week 4
-```{r adj1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+```{r adj1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE}
 
 Response4 = Week4_response$deltaCDAIwk0_4
 Treatment4 = Week4_response$Treatment
@@ -357,6 +355,58 @@ ggplot(adj_week4, aes(x=measures, y=pvalue_rho)) +
   geom_line(aes( x, y, linetype = cutoff ), cutoff)
 
 ggplot(adj_week4, aes(x=measures, y=pvalue_rho_adj)) +
+  geom_point(size=3) +  theme_pubr() + ylab("Adjusted pvalues") + xlab("")+ 
+  geom_line(aes( x, y, linetype = cutoff ), cutoff)
+
+
+```
+
+
+### Week 6
+```{r adj22, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE}
+
+Response6 = Week6_response$deltaCDAIwk0_6
+Treatment6 = Week6_response$Treatment
+rich_week6new = rich_week6[,-c(4,5,10,11,12)]
+
+adj_week6 = JM(t(rich_week6new), Response6 , Treatment6, MultTest="fdr")
+adj_week6$measures = c("Obse" , "Chao1","se.chao1" ,"Shann","Simps","InvSimps", "Fisher")
+cutoff <- data.frame( x = c(-Inf, Inf), y = 0.05, cutoff = factor(0.05) )
+
+ggplot(adj_week6, aes(x=measures, y=rho)) +
+  geom_point(size=3) +  theme_pubr() + ylab(expression(rho)) + xlab("")
+
+ggplot(adj_week6, aes(x=measures, y=pvalue_rho)) +
+  geom_point(size=3) +  theme_pubr() + ylab("Unadjusted pvalues") + xlab("")+ 
+  geom_line(aes( x, y, linetype = cutoff ), cutoff)
+
+ggplot(adj_week6, aes(x=measures, y=pvalue_rho_adj)) +
+  geom_point(size=3) +  theme_pubr() + ylab("Adjusted pvalues") + xlab("")+ 
+  geom_line(aes( x, y, linetype = cutoff ), cutoff)
+
+
+```
+
+
+### Week 22
+```{r adj32, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE}
+
+Response22 = Week22_response$deltaCDAIwk0_22
+Treatment22 = Week22_response$Treatment
+rich_week22new = rich_week22[,-c(10,11,12)]
+
+adj_week22 = JM(t(rich_week22new), Response22 , Treatment22, MultTest="fdr")
+adj_week22$measures = c("Obse" , "Chao1","se.chao1" ,"ACE" ,"se.ACE","Shann","Simps","InvSimps", "Fisher")
+cutoff <- data.frame( x = c(-Inf, Inf), y = 0.05, cutoff = factor(0.05) )
+
+ggplot(adj_week22, aes(x=measures, y=rho)) +
+  geom_point(size=3) +  theme_pubr() + ylab(expression(rho)) + xlab("")
+
+ggplot(adj_week22, aes(x=measures, y=pvalue_rho)) +
+  geom_point(size=3) +  theme_pubr() + ylab("Unadjusted pvalues") + xlab("")+ 
+  geom_line(aes( x, y, linetype = cutoff ), cutoff)
+
+ggplot(adj_week22, aes(x=measures, y=pvalue_rho_adj)) +
   geom_point(size=3) +  theme_pubr() + ylab("Adjusted pvalues") + xlab("")+ 
   geom_line(aes( x, y, linetype = cutoff ), cutoff)
 
