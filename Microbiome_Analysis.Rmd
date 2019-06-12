@@ -93,7 +93,7 @@ prop_zero = data.frame(otunames = colnames(Week22_otu), Full_data = freq_zero$Fu
 
 ```
 
-## Frequency and proportion of zero samples per OTU
+## Proportion of zero samples per OTU
 ### At all timepoints
 
 ```{r g1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
@@ -162,4 +162,27 @@ rich_week0 <- estimate_richness(phy_week0)
 rich_week4 <- estimate_richness(phy_week4)
 rich_week6 <- estimate_richness(phy_week6)
 rich_week22 <- estimate_richness(phy_week22)
+
+# The relative abundance of each OTU within each sample
+
+relab_week0 = transform_sample_counts(phy_week0, function(x) x/sum(x))
+relab_week4 = transform_sample_counts(phy_week4, function(x) x/sum(x))
+relab_week6 = transform_sample_counts(phy_week6, function(x) x/sum(x))
+relab_week22 = transform_sample_counts(phy_week22, function(x) x/sum(x))
+
+
+pallzero <- data.frame(value = c(as.vector(length(which(apply(Screening_otu, 2, sum)==0))),as.vector(length(which(apply(Week4_otu, 2, sum)==0))),as.vector(length(which(apply(Week6_otu, 2, sum)==0))),as.vector(length(which(apply(Week22_otu, 2, sum)==0)))), Timepoint = c("Week0", "Week4", "Week6", "Week22"))
+pallzero$prop <- pallzero$value/ dim(Screening_otu)[2]
+pallzero$Timepoint <- factor(pallzero$Timepoint, levels = c("Week0","Week4","Week6","Week22"))
+
 ```
+
+## Proportion of OTU per week with zero values for all sample
+### All timepoints
+```{r g6, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(pallzero, aes(x=Timepoint, y=prop)) +
+  geom_bar(stat = "identity") + xlab("") +  theme_pubr() + ylab("Proportion of zeros")
+
+```
+
