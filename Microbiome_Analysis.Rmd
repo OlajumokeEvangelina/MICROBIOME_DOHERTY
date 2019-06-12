@@ -23,7 +23,74 @@ library(phyloseq)
 library(tidyr)
 library(ggpubr)
 library(gridExtra)
+library(IntegratedJM)
 ```
+
+
+```{r functionjm, echo=FALSE, message=FALSE, warning=FALSE,cache=TRUE}
+JM = function(Mdata, Response , Covariates, MultTest){
+  
+  Response2 = as.vector(Response)
+  Nmets <- as.numeric(nrow(Mdata))
+  pearson <- spearman <- pValuePearson <- logratio <- AdjPearson  <-  c(1:Nmets) 
+  Names <- rownames(Mdata)
+  
+  
+  for (Nmet in 1:length(Names)) {
+    print(Nmet)
+    feature1 <-as.vector(Mdata[Nmet,])
+    sampleID <- c(1:length(feature1)) 
+    
+    data <- data.frame(rbind(cbind(feature1, Covariates, sampleID), 
+      cbind(Response2, Covariates,  sampleID)),
+     respIndex = c(rep(1,length(feature1)),rep(2,length(Response2))))
+    
+    colnames(data) <- c("Responses", "myCov", "sampleID", 
+                        "respIndex")
+    
+    #fit compound symmetry covariance structure
+    f1 <- try( gls(Responses ~ myCov * as.factor(respIndex),
+                   correlation = corSymm(form = ~ respIndex| sampleID),
+                   weights = varIdent(form=~ 1|respIndex),
+                   data = data, method = "ML"),silent=TRUE)
+    
+    
+    #fit independence covariance structure
+    f2 <- try(gls(Responses ~ myCov * as.factor(respIndex),
+                  weights = varIdent(form=~ 1|respIndex),
+                  data = data, method="ML"),silent=TRUE)
+    
+    #Likelihood Ratio Test
+    LRT <- try(anova(f1,f2),silent=TRUE)
+    logratio[Nmet] <- LRT[2,8]
+    
+    #compute for correlation coeffcients 
+    pearson[Nmet] <- try(getVarCov(f1)[1,2]/(sqrt(getVarCov(f1)[1,1])*
+                                                 sqrt(getVarCov(f1)[2,2]) ),silent=TRUE)
+    
+    pValuePearson[Nmet] <- try(as.numeric(LRT$"p-value"[2]), 
+                                 silent=TRUE)             
+    
+    
+    spearman[Nmet] <- cor(residuals(f1)[1:length(Response2)],
+                            residuals(f1)[(length(Response2)+1):nrow(data)], 
+                            method = "spearman")
+    
+    #adjust pValues
+    AdjPearson[Nmet] <- p.adjust(pValuePearson[Nmet], method = MultTest, 
+                           n = Nmets)
+    
+    
+    result <- data.frame(pearson, pValuePearson, AdjPearson, spearman,logratio)
+    
+    colnames(result) <- c("rho","pvalue_rho", "pvalue_rho_adj"  ,"Spearman","logratio")
+    rownames(result) <- Names
+    
+  }
+  return(result)
+}
+```
+
 
 
 ## General information
@@ -111,7 +178,7 @@ prop_zero = data.frame(otunames = colnames(Week22_otu), Full_data = freq_zero$Fu
 ```{r g1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(prop_zero, aes(x=otunumber, y=Full_data)) +
-  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero")+
+  geom_point() + xlab("OTU number") +  theme_pubr() + ylab("Proportion of zero") +
   scale_y_continuous(breaks  = seq(0,1, by = 0.05))
 
 ```
@@ -270,4 +337,28 @@ grid.arrange(a3, a4, nrow = 1)
 
 ```
 
-## Adjusted association from Joint modelling 
+## Adjusted association from Joint modelling  (Response is CDAI change from baseline)
+### Week 4
+```{r adj1, echo=FALSE,fig.width=12,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+
+Response4 = Week4_response$deltaCDAIwk0_4
+Treatment4 = Week4_response$Treatment
+rich_week4new = rich_week4[,1:9]
+
+adj_week4 = JM(t(rich_week4new), Response4 , Treatment4, MultTest="fdr")
+adj_week4$measures = c("Obse" , "Chao1","se.chao1" ,"ACE" ,"se.ACE","Shann","Simps","InvSimps", "Fisher")
+cutoff <- data.frame( x = c(-Inf, Inf), y = 0.05, cutoff = factor(0.05) )
+
+ggplot(adj_week4, aes(x=measures, y=rho)) +
+  geom_point(size=3) +  theme_pubr() + ylab(expression(rho)) + xlab("")
+
+ggplot(adj_week4, aes(x=measures, y=pvalue_rho)) +
+  geom_point(size=3) +  theme_pubr() + ylab("Unadjusted pvalues") + xlab("")+ 
+  geom_line(aes( x, y, linetype = cutoff ), cutoff)
+
+ggplot(adj_week4, aes(x=measures, y=pvalue_rho_adj)) +
+  geom_point(size=3) +  theme_pubr() + ylab("Adjusted pvalues") + xlab("")+ 
+  geom_line(aes( x, y, linetype = cutoff ), cutoff)
+
+
+```
