@@ -22,25 +22,36 @@ library(dplyr)
 library(phyloseq)
 library(tidyr)
 library(ggpubr)
+library(gridExtra)
 ```
 
 
 ## General information
 
 * The dataset is a large phyloseq object saved as R datafile.
+
 * The metadata has been converted to phyloseq format.
+
 * The sample are Crohn's disease patients.
+
 * The CDAI is the standard instrument for evaluating clinical symptoms and disease activity in Crohn's disease.
+
 * Samples are randomized to take PlaceboIV or UstekinumabIV ni the trial.
+
 * Taxonomic assignment of the OTU into 6 taxonomic ranks (Tax data) which are;
 "Kingdom" "Phylum"  "Class"   "Order"   "Family"  "Genus".
+
 * OTU Table contains 2353 taxa and 992 samples for all time point (OTU table).
+
 * 83 information was obtained about the samples which includes their age, sex, race , country, treatment information, CDAI etc. 
+
 * 306 samples information was obtained by baseline, 236 at week4, 261 at week 6 and 189 at week 22. No information about week 8.
+
 * Difference in a subject’s initial Crohn’s disease activity index (CDAI) at baseline and other time point $\Delta_4 - \Delta_0$, $\Delta_6 - \Delta_0$, $\Delta_8 - \Delta_0$, $\Delta_{22} - \Delta_0$.
+
 * Placebo samples were coded as 0 while treated samples were coded as 1.
 
-
+\newpage
 
 ```{r first, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 load("C:/Users/lucp2490.LP2490-02/Desktop/EVANGELINA/PHD FOLDER/PHD/DEA/certifi_ori.rda")
@@ -53,24 +64,25 @@ SAMPEL$Treatment= ifelse(SAMPEL$TRTGR=="Placebo",0,1)
 
 Screening_response <- SAMPEL %>% filter(visit == "Screening") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
                 "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
-                "percentdelta0_4"))
+                "cdail_wk0","cdail_wk4","cdail_wk6","cdail_wk22","TRTGR"))
 
 
 Week4_response <- SAMPEL %>% filter(visit == "Week 4") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
               "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
-              "percentdelta0_4"))
+              "cdail_wk0","cdail_wk4","cdail_wk6","cdail_wk22","TRTGR"))
 
 
 
 Week6_response <- SAMPEL %>% filter(visit == "Week 6") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
             "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
-           "percentdelta0_4"))
+           "cdail_wk0","cdail_wk4","cdail_wk6","cdail_wk22","TRTGR"))
 
 
 
 Week22_response <- SAMPEL %>% filter(visit == "Week 22") %>% select(c("USUBJID", "AGE","SEX","RACE","COUNTRY","Treatment",
                       "deltaCDAIwk0_22","deltaCDAIwk0_8","deltaCDAIwk0_6","deltaCDAIwk0_4","deltaCDAIwk8_22",
-                       "percentdelta0_4"))
+                      "cdail_wk0","cdail_wk4","cdail_wk6","cdail_wk22","TRTGR"))
+
 
 otu = as.data.frame(t(OTU))
 otu$visit = SAMPEL$visit
@@ -186,3 +198,76 @@ ggplot(pallzero, aes(x=Timepoint, y=prop)) +
 
 ```
 
+## Alpha-diversity plot
+### Week 4
+```{r g7, echo=FALSE,fig.width=14,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+rich_week4$R1 <- Week4_response$deltaCDAIwk0_4
+rich_week4$R2 <- Week4_response$cdail_wk4
+rich_week4$Group <- Week4_response$TRTGR
+
+p1 = ggplot(rich_week4, aes(x=Observed, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Observed richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+p2 = ggplot(rich_week4, aes(x=Chao1, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Chao1 richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+p3 = ggplot(rich_week4, aes(x=Shannon, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Shannon richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+p4 = ggplot(rich_week4, aes(x=Simpson, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Simpson richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+grid.arrange(p1, p2, nrow = 1)
+grid.arrange(p3, p4, nrow = 1)
+
+```
+
+
+### Week 6
+```{r g8, echo=FALSE,fig.width=14,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+rich_week6$R1 <- Week6_response$deltaCDAIwk0_6
+rich_week6$R2 <- Week6_response$cdail_wk6
+rich_week6$Group <- Week6_response$TRTGR
+
+p11 = ggplot(rich_week6, aes(x=Observed, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Observed richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+p21 = ggplot(rich_week6, aes(x=Chao1, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Chao1 richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+p31 = ggplot(rich_week6, aes(x=Shannon, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Shannon richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+p41 = ggplot(rich_week6, aes(x=Simpson, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Simpson richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+grid.arrange(p11, p21, nrow = 1)
+grid.arrange(p31, p41, nrow = 1)
+
+```
+
+
+### Week 22
+```{r g9, echo=FALSE,fig.width=14,fig.height=7,fig.show='hold',fig.align='center', message=FALSE, warning=FALSE, cache=TRUE, warning=FALSE}
+rich_week22$R1 <- Week22_response$deltaCDAIwk0_22
+rich_week22$R2 <- Week22_response$cdail_wk22
+rich_week22$Group <- Week22_response$TRTGR
+
+a1 = ggplot(rich_week22, aes(x=Observed, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Observed richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+a2 = ggplot(rich_week22, aes(x=Chao1, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Chao1 richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+a3 = ggplot(rich_week22, aes(x=Shannon, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Shannon richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+a4 = ggplot(rich_week22, aes(x=Simpson, y=R1, color = Group, shape = Group)) +
+geom_point(size=3) + xlab("\u03b1-diversity = Simpson richness") +  theme_pubr() + ylab("CDAI change from baseline")
+
+grid.arrange(a1, a2, nrow = 1)
+grid.arrange(a3, a4, nrow = 1)
+
+```
+
+## Adjusted association from Joint modelling 
